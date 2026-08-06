@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tardigrade Survival — For AP Animal Science Teachers</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=IBM+Plex+Mono:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    /* a petri-dish / fluorescence-microscopy palette — deep agar greens,
+       a stained-slide teal, and a biohazard amber-red for danger/CTAs */
+    --navy:#071a14;
+    --navy-2:#0f3d2e;
+    --navy-3:#1c6b4f;
+    --coral:#ff5c5c;
+    --gold:#f3c14b;
+    --ice:#bdf2e0;
+    --white:#f4fff9;
+    --muted:#6fa08c;
+    --green:#35d68a;
+  }
+  *{ box-sizing:border-box; margin:0; padding:0; }
+  html{ scroll-behavior:smooth; }
+  body{
+    background:var(--navy);
+    background-image: radial-gradient(circle, rgba(255,255,255,0.05) 1px, transparent 1.6px);
+    background-size: 28px 28px;
+    color:var(--white);
+    font-family:"IBM Plex Sans",-apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif;
+    overflow-x:hidden;
+  }
+  .serif{ font-family:"Fraunces",Georgia,"Times New Roman",serif; }
+  .mono{ font-family:"IBM Plex Mono",Menlo,Consolas,monospace; }
+  button, a.btn{ font-family:inherit; }
+
+  #progress{
+    position:fixed; top:0; left:0; height:4px; width:0%;
+    background:linear-gradient(90deg,var(--coral),var(--gold));
+    z-index:999; transition:width .1s linear;
+  }
+
+  section{
+    min-height:100vh;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    text-align:center;
+    padding:8vh 6vw;
+    position:relative;
+  }
+
+  .reveal{ opacity:0; transform:translateY(28px); transition:opacity .9s ease, transform .9s ease; }
+  .reveal.visible{ opacity:1; transform:translateY(0); }
+
+  .eyebrow{
+    letter-spacing:0.3em; text-transform:uppercase; font-family:"IBM Plex Mono",monospace;
+    font-size:clamp(11px,1.4vw,14px); color:var(--gold); font-weight:600; margin-bottom:20px;
+  }
+  .eyebrow::before{ content:"◈ "; }
+  .wide{ max-width:74ch; margin:0 auto; }
+
+  /* HERO */
+  #hero{
+    background:
+      radial-gradient(circle at 50% 42%, rgba(28,107,79,0.55) 0%, transparent 42%),
+      radial-gradient(ellipse at 30% 20%, rgba(15,61,46,0.9) 0%, rgba(7,26,20,1) 55%),
+      repeating-radial-gradient(circle at 80% 70%, rgba(255,255,255,0.035) 0px, rgba(255,255,255,0.035) 1px, transparent 1px, transparent 40px);
+  }
+  #hero h1{ font-size:clamp(2.2rem,6vw,4.4rem); line-height:1.08; max-width:20ch; font-weight:600; }
+  #hero .sub{ margin-top:26px; color:var(--ice); font-size:clamp(1rem,2vw,1.25rem); max-width:52ch; line-height:1.6; }
+  .scroll-cue{
+    position:absolute; bottom:36px; left:50%; transform:translateX(-50%);
+    font-size:13px; letter-spacing:.2em; text-transform:uppercase; color:var(--muted); font-family:"IBM Plex Mono",monospace;
+    display:flex; flex-direction:column; align-items:center; gap:8px;
+  }
+  .scroll-cue span{ width:1px; height:34px; background:linear-gradient(var(--muted), transparent); animation:pulse 1.8s ease-in-out infinite; }
+  @keyframes pulse{ 0%,100%{ opacity:.3 } 50%{ opacity:1 } }
+
+  .btn{
+    display:inline-block; margin-top:34px; color:var(--navy); border:2px dashed rgba(7,26,20,0.35); text-decoration:none;
+    background:radial-gradient(circle at 30% 25%, #ffe08a, var(--gold) 70%);
+    padding:17px 38px; font-size:1.02rem; font-weight:700; font-family:"IBM Plex Mono",monospace; border-radius:999px; cursor:pointer;
+    box-shadow:0 8px 24px rgba(243,193,75,0.3); transition:transform .15s ease, box-shadow .15s ease;
+  }
+  .btn:hover{ transform:translateY(-2px) scale(1.02); box-shadow:0 12px 30px rgba(243,193,75,0.45); }
+  .btn.secondary{ background:transparent; border:2px dashed var(--ice); color:var(--ice); box-shadow:none; }
+
+  /* MONDAY PROBLEM */
+  #problem{ background:#0a2a20; }
+  #problem h2{ font-size:clamp(1.8rem,4vw,2.6rem); margin-bottom:22px; }
+  #problem p{ color:var(--ice); font-size:clamp(1rem,1.8vw,1.2rem); line-height:1.75; }
+  .word-row{
+    display:flex; flex-wrap:wrap; gap:10px; justify-content:center; margin:32px 0;
+  }
+  .word-chip{
+    background:rgba(255,255,255,0.07); border:1px dashed rgba(255,255,255,0.25); border-radius:999px;
+    padding:9px 18px; font-weight:600; font-size:.88rem; color:var(--gold); font-family:"IBM Plex Mono",monospace;
+  }
+  .old-way{
+    margin-top:30px; display:flex; gap:14px; justify-content:center; flex-wrap:wrap; color:var(--muted); font-size:.95rem;
+  }
+  .old-way span{ background:rgba(255,92,92,0.1); border:1px solid rgba(255,92,92,0.3); border-radius:10px; padding:8px 14px; }
+
+  /* PIVOT */
+  #pivot{ background:linear-gradient(180deg,#0a2a20 0%, var(--navy) 100%); }
+  #pivot .line1{ font-size:clamp(1.2rem,3vw,1.8rem); color:var(--ice); font-weight:500; max-width:36ch; }
+  #pivot .line2{ margin-top:26px; font-size:clamp(1.9rem,5vw,3.2rem); font-weight:800; color:var(--white); max-width:26ch; }
+  #pivot .line2 em{ color:var(--coral); font-style:normal; }
+
+  /* MECHANIC MAP */
+  #map{ background:var(--navy-2); padding-top:10vh; padding-bottom:10vh; }
+  #map h2{ font-size:clamp(1.8rem,4vw,2.6rem); margin-bottom:14px; }
+  #map .intro-text{ color:var(--ice); max-width:64ch; margin:0 auto 50px; font-size:clamp(1rem,1.7vw,1.15rem); line-height:1.7; }
+  .term-grid{
+    display:grid; grid-template-columns:repeat(auto-fit,minmax(260px,1fr));
+    gap:20px; width:min(1000px,94vw); text-align:left;
+  }
+  .term-card{
+    background:rgba(255,255,255,0.06); border-radius:18px; padding:24px 24px 22px; border:1px solid rgba(255,255,255,0.1);
+  }
+  .term-card h3{ color:var(--gold); font-size:1.15rem; margin-bottom:10px; }
+  .term-card .def{ color:var(--ice); font-size:.92rem; line-height:1.55; margin-bottom:14px; }
+  .term-card .mech{
+    background:rgba(0,0,0,0.18); border-radius:12px; padding:12px 14px; font-size:.86rem; color:var(--white);
+    line-height:1.55; border-left:3px solid var(--coral);
+  }
+  .term-card .mech b{ color:var(--coral); }
+
+  /* REPETITION */
+  #repeat{ background:#07211a; }
+  #repeat h2{ font-size:clamp(1.8rem,4vw,2.6rem); margin-bottom:40px; }
+  .feature-row{
+    display:grid; grid-template-columns:repeat(auto-fit,minmax(230px,1fr));
+    gap:18px; width:min(980px,94vw);
+  }
+  .feature-card{
+    background:rgba(255,255,255,0.05); border-radius:16px; padding:22px; text-align:left;
+  }
+  .feature-card .ic{ font-size:1.8rem; margin-bottom:10px; }
+  .feature-card h4{ color:var(--white); font-size:1rem; margin-bottom:8px; }
+  .feature-card p{ color:var(--muted); font-size:.88rem; line-height:1.55; }
+
+  /* CLASSROOM USE */
+  #use{ background:var(--navy); }
+  #use h2{ font-size:clamp(1.8rem,4vw,2.6rem); margin-bottom:40px; }
+  .use-grid{
+    display:grid; grid-template-columns:repeat(auto-fit,minmax(240px,1fr));
+    gap:18px; width:min(980px,94vw); text-align:left;
+  }
+  .use-card{
+    background:rgba(255,255,255,0.06); border-radius:16px; padding:22px; border:1px solid rgba(255,255,255,0.1);
+  }
+  .use-card .tag{
+    display:inline-block; font-size:.65rem; letter-spacing:.08em; text-transform:uppercase; font-weight:700;
+    font-family:"IBM Plex Mono",monospace; color:var(--navy); background:var(--gold); border-radius:999px; padding:4px 10px; margin-bottom:12px;
+  }
+  .use-card h4{ font-size:1.05rem; margin-bottom:8px; color:var(--white); }
+  .use-card p{ color:var(--ice); font-size:.9rem; line-height:1.55; }
+
+  /* FINAL CTA */
+  #cta{ background:linear-gradient(180deg, var(--navy) 0%, #020a07 100%); }
+  #cta h2{ font-size:clamp(2rem,5vw,3.2rem); max-width:22ch; }
+  #cta p{ margin-top:20px; color:var(--ice); max-width:56ch; font-size:clamp(1rem,1.8vw,1.15rem); line-height:1.7; }
+  .cta-row{ display:flex; gap:16px; flex-wrap:wrap; justify-content:center; margin-top:34px; }
+  .note{ margin-top:28px; color:var(--muted); font-size:.85rem; max-width:50ch; }
+
+  footer{ background:#020a07; color:var(--muted); text-align:center; padding:40px 20px; font-size:.85rem; min-height:auto; font-family:"IBM Plex Mono",monospace; }
+</style>
+</head>
+<body>
+
+<div id="progress"></div>
+
+<section id="hero">
+  <div class="eyebrow">A Teaching Tool, Built From One Lesson</div>
+  <h1 class="serif">You Have 5 Vocabulary Words And One Class Period.</h1>
+  <p class="sub">Extremophile. Cryptobiosis. Tun state. Desiccation. Ametabolic. Your AP Animal Science (or bio, or life science) students need to actually understand these — not just recognize them on a matching quiz. Here's what happened when that problem got turned into a game.</p>
+  <div class="scroll-cue"><span></span>SCROLL</div>
+</section>
+
+<section id="problem">
+  <h2 class="serif reveal">The Monday You Already Know</h2>
+  <p class="wide reveal">You're teaching the tardigrade unit — one of the best hooks in the curriculum, because the organism itself is genuinely wild. But the five words that explain <em>how</em> it survives are dense, Latin-rooted, and easy to confuse with each other.</p>
+  <div class="word-row reveal">
+    <span class="word-chip">Extremophile</span>
+    <span class="word-chip">Cryptobiosis</span>
+    <span class="word-chip">Tun State</span>
+    <span class="word-chip">Desiccation</span>
+    <span class="word-chip">Ametabolic</span>
+  </div>
+  <p class="wide reveal">You could hand out a worksheet. Make flashcards. Have them copy definitions. It works for the kids who were already going to be fine. Everyone else memorizes just enough to survive Friday's quiz, then loses it by winter break.</p>
+  <div class="old-way reveal">
+    <span>📋 Matching worksheet</span>
+    <span>🗂️ Flashcard app</span>
+    <span>✍️ Copy the definition 3x</span>
+  </div>
+</section>
+
+<section id="pivot">
+  <div class="line1 reveal">So instead of asking students to define the words on paper...</div>
+  <div class="line2 reveal">...the words became <em>the reason they survive</em>.</div>
+</section>
+
+<section id="map">
+  <h2 class="serif reveal">Every Vocabulary Word Is Now A Game Mechanic</h2>
+  <p class="intro-text reveal">This isn't trivia bolted onto a game. Each term is the literal solution to a specific, repeated threat. Get the word wrong — or don't react fast enough — and the consequence is immediate and visible, not a red mark three days later.</p>
+  <div class="term-grid">
+    <div class="term-card reveal">
+      <h3>❄️ Cryptobiosis</h3>
+      <div class="def">A reversible state where metabolism drops to nearly undetectable levels under extreme conditions.</div>
+      <div class="mech"><b>In-game:</b> A drifting Cold Zone and its Frost Mite guardian only back off when this power is switched on. Students feel the difference between "knowing the word" and "knowing when to use it."</div>
+    </div>
+    <div class="term-card reveal">
+      <h3>🔥 Desiccation</h3>
+      <div class="def">The process of removing nearly all water from a cell or organism.</div>
+      <div class="mech"><b>In-game:</b> Countered in the Heat Zone against the Ember Worm. Reinforces that this is a <i>process</i>, distinct from the resulting shape (Tun State) — a mix-up that shows up on every quiz.</div>
+    </div>
+    <div class="term-card reveal">
+      <h3>💧 Tun State</h3>
+      <div class="def">The dried, curled-up shape a tardigrade forms when entering cryptobiosis.</div>
+      <div class="mech"><b>In-game:</b> The answer to the Drought Zone and Dust Rotifer. Separating this from Desiccation and Cryptobiosis in gameplay is what finally makes the distinction stick.</div>
+    </div>
+    <div class="term-card reveal">
+      <h3>☢️ Extremophile</h3>
+      <div class="def">An organism that thrives in conditions most life can't survive.</div>
+      <div class="mech"><b>In-game:</b> The category-level term — countered against the Radiation Zone and Rad Beetle, framed as "what makes the whole unit possible" rather than one hazard among five.</div>
+    </div>
+    <div class="term-card reveal">
+      <h3>🌌 Ametabolic</h3>
+      <div class="def">A state with no detectable metabolic activity — biology, paused.</div>
+      <div class="mech"><b>In-game:</b> The answer to the Vacuum Zone and Void Wisp, and the correct response during whole-map "surge" events — testing recall under real time pressure, not untimed recognition.</div>
+    </div>
+  </div>
+</section>
+
+<section id="repeat">
+  <h2 class="serif reveal">Repetition, Without It Feeling Like Repetition</h2>
+  <div class="feature-row">
+    <div class="feature-card reveal">
+      <div class="ic">⏱️</div>
+      <h4>90-second rounds</h4>
+      <p>Short enough to replay 3-4 times in a single class period without losing the room. Every replay is another rep on all five terms.</p>
+    </div>
+    <div class="feature-card reveal">
+      <div class="ic">⚠️</div>
+      <h4>World-wide surges</h4>
+      <p>Every 15-20 seconds, a random hazard hits the entire map with a 3-second warning — a built-in, self-repeating flashcard drill that never feels like one.</p>
+    </div>
+    <div class="feature-card reveal">
+      <div class="ic">🧬</div>
+      <h4>Losing still teaches</h4>
+      <p>Every run — win or lose — ends with the full glossary: definition <i>and</i> mechanism for all five terms, with checkmarks for what the student actually used.</p>
+    </div>
+    <div class="feature-card reveal">
+      <div class="ic">💪</div>
+      <h4>Rival tardigrades</h4>
+      <p>Wild tardigrades roam the map with a visible power level. Switching on the correct survival power doesn't just block a hazard — it makes the student's own tardigrade stronger, reinforcing "knowledge = capability" directly.</p>
+    </div>
+  </div>
+</section>
+
+<section id="use">
+  <h2 class="serif reveal">Ways to Actually Use This in Class</h2>
+  <div class="use-grid">
+    <div class="use-card reveal">
+      <div class="tag">Bell Ringer</div>
+      <h4>5-minute warm-up</h4>
+      <p>One round while you take attendance. Ask two students to explain why they died, out loud, before you start the lesson.</p>
+    </div>
+    <div class="use-card reveal">
+      <div class="tag">Pre-Quiz Review</div>
+      <h4>The day before the test</h4>
+      <p>Play in pairs. The loss screen's glossary becomes their last study sheet — but one they actually read, because they just needed it.</p>
+    </div>
+    <div class="use-card reveal">
+      <div class="tag">Sub Day / Station</div>
+      <h4>Runs itself</h4>
+      <p>Self-contained in one HTML file — no login, no account, no setup. Point a browser at it and the instructions are on screen.</p>
+    </div>
+    <div class="use-card reveal">
+      <div class="tag">Differentiation</div>
+      <h4>Same game, two goals</h4>
+      <p>Struggling students: survive one full round using the glossary as a safety net. Advanced students: chase "Rivals Outpowered" and "Predators Outsmarted" for a real challenge.</p>
+    </div>
+  </div>
+</section>
+
+<section id="cta">
+  <h2 class="serif reveal">You Already Built the Hard Part.</h2>
+  <p class="reveal">The lesson plan, the vocabulary, the real research — that's the part that actually took expertise. This is just the delivery mechanism. Try a round yourself first; you'll want to know what "getting eaten by a Rad Beetle" feels like before your students tell you about it.</p>
+  <div class="cta-row reveal">
+    <a class="btn" href="tardigrade-survival-game.html">Play the Game →</a>
+  </div>
+  <p class="note reveal">Built as a single self-contained HTML file — safe to project, share as a link, or hand to a sub with zero setup. The tardigrade's look is a placeholder shape; swap in your own sprite sheet whenever you're ready.</p>
+</section>
+
+<footer>
+  Exhibit A &middot; Tardigrade Survival Mode &middot; a vocabulary unit that bites back
+</footer>
+
+<script>
+  window.addEventListener('scroll', function(){
+    var h = document.documentElement;
+    var scrolled = (h.scrollTop) / (h.scrollHeight - h.clientHeight) * 100;
+    document.getElementById('progress').style.width = scrolled + '%';
+  });
+
+  var observer = new IntersectionObserver(function(entries){
+    entries.forEach(function(entry){
+      if(entry.isIntersecting){ entry.target.classList.add('visible'); }
+    });
+  }, { threshold: 0.15 });
+  document.querySelectorAll('.reveal').forEach(function(el){ observer.observe(el); });
+</script>
+
+</body>
+</html>

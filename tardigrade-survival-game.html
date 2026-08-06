@@ -1,0 +1,1473 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tardigrade Survival — Be the Water Bear</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=IBM+Plex+Mono:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    /* a petri-dish / fluorescence-microscopy palette — deep agar greens,
+       a stained-slide teal, and a biohazard amber-red for danger/CTAs.
+       Hazard-zone colors (cold=blue, heat=orange, etc.) stay untouched
+       below since those hues are tied to the vocabulary, not the chrome. */
+    --navy:#071a14;
+    --navy-2:#0f3d2e;
+    --navy-3:#1c6b4f;
+    --coral:#ff5c5c;
+    --gold:#f3c14b;
+    --ice:#bdf2e0;
+    --white:#f4fff9;
+    --muted:#6fa08c;
+    --green:#35d68a;
+  }
+  *{ box-sizing:border-box; margin:0; padding:0; }
+  html{ scroll-behavior:smooth; }
+  body{
+    background:var(--navy);
+    background-image: radial-gradient(circle, rgba(255,255,255,0.05) 1px, transparent 1.6px);
+    background-size: 28px 28px;
+    color:var(--white);
+    font-family:"IBM Plex Sans",-apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif;
+    overflow-x:hidden;
+  }
+  .serif{ font-family:"Fraunces",Georgia,"Times New Roman",serif; }
+  .mono{ font-family:"IBM Plex Mono",Menlo,Consolas,monospace; }
+  button{ font-family:inherit; }
+
+  #progress{
+    position:fixed; top:0; left:0; height:4px; width:0%;
+    background:linear-gradient(90deg,var(--coral),var(--gold));
+    z-index:999; transition:width .1s linear;
+  }
+
+  section{
+    min-height:100vh;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    text-align:center;
+    padding:6vh 6vw;
+    position:relative;
+  }
+
+  .reveal{ opacity:0; transform:translateY(28px); transition:opacity .9s ease, transform .9s ease; }
+  .reveal.visible{ opacity:1; transform:translateY(0); }
+
+  /* HERO */
+  #hero{
+    background:
+      radial-gradient(circle at 50% 42%, rgba(28,107,79,0.5) 0%, transparent 42%),
+      radial-gradient(ellipse at 30% 20%, rgba(15,61,46,0.9) 0%, rgba(7,26,20,1) 55%),
+      repeating-radial-gradient(circle at 80% 70%, rgba(255,255,255,0.035) 0px, rgba(255,255,255,0.035) 1px, transparent 1px, transparent 40px);
+  }
+  .eyebrow{
+    letter-spacing:0.3em; text-transform:uppercase; font-family:"IBM Plex Mono",monospace;
+    font-size:clamp(11px,1.4vw,14px); color:var(--gold); font-weight:600; margin-bottom:22px;
+  }
+  .eyebrow::before{ content:"◈ "; }
+  #hero h1{ font-size:clamp(2.4rem,7vw,5.2rem); line-height:1.05; max-width:14ch; font-weight:700; }
+  #hero .sub{ margin-top:26px; color:var(--ice); font-size:clamp(1rem,2vw,1.3rem); max-width:38ch; }
+  .scroll-cue{
+    position:absolute; bottom:36px; left:50%; transform:translateX(-50%);
+    font-size:13px; letter-spacing:.2em; text-transform:uppercase; color:var(--muted);
+    display:flex; flex-direction:column; align-items:center; gap:8px;
+  }
+  .scroll-cue span{ width:1px; height:34px; background:linear-gradient(var(--muted), transparent); animation:pulse 1.8s ease-in-out infinite; }
+  @keyframes pulse{ 0%,100%{ opacity:.3 } 50%{ opacity:1 } }
+
+  /* TRIALS (backstory) */
+  .trial{ background:var(--navy); }
+  .trial:nth-of-type(even){ background:#0a2a20; }
+  .trial .icon{ font-size:clamp(2.4rem,5vw,3.4rem); margin-bottom:18px; }
+  .trial .stat{
+    font-size:clamp(3.4rem,11vw,7.5rem); font-weight:800; line-height:1;
+    background:linear-gradient(120deg,var(--gold),var(--coral));
+    -webkit-background-clip:text; background-clip:text; color:transparent;
+  }
+  .trial .label{ margin-top:14px; font-size:clamp(1.1rem,2.4vw,1.6rem); color:var(--white); font-weight:600; }
+  .trial .flavor{ margin-top:16px; max-width:46ch; color:var(--muted); font-size:clamp(.95rem,1.6vw,1.1rem); line-height:1.6; }
+  .trial-index{ position:absolute; top:32px; left:50%; transform:translateX(-50%); font-size:12px; letter-spacing:.3em; color:var(--navy-3); font-weight:700; }
+
+  /* TWIST */
+  #twist{ background:linear-gradient(180deg,#0a2a20 0%, var(--navy) 100%); }
+  #twist .line1{ font-size:clamp(1.3rem,3.5vw,2.2rem); color:var(--ice); font-weight:500; }
+  #twist .line2{ margin-top:28px; font-size:clamp(2.2rem,6vw,4rem); font-weight:800; color:var(--white); }
+  #twist .line2 em{ color:var(--coral); font-style:normal; }
+
+  /* MECHANISM */
+  #mechanism{ background:var(--navy-2); }
+  #mechanism h2{ font-size:clamp(1.8rem,4vw,2.8rem); margin-bottom:26px; }
+  #mechanism p{ max-width:60ch; font-size:clamp(1rem,1.8vw,1.25rem); line-height:1.75; color:var(--ice); }
+  #mechanism .term{ color:var(--gold); font-weight:700; font-style:italic; }
+
+  /* REVEAL (short) */
+  #reveal{ background:#07211a; }
+  #reveal .creature-emoji{ font-size:clamp(3rem,7vw,4.5rem); margin-bottom:10px; }
+  #reveal h2{ font-size:clamp(2rem,5vw,3.2rem); }
+  #reveal p{ margin-top:16px; max-width:48ch; color:var(--muted); font-size:clamp(1rem,1.8vw,1.15rem); }
+  .btn{
+    margin-top:34px; color:var(--navy); border:2px dashed rgba(7,26,20,0.35);
+    background:radial-gradient(circle at 30% 25%, #ffe08a, var(--gold) 70%);
+    padding:17px 38px; font-size:1.02rem; font-weight:700; font-family:"IBM Plex Mono",monospace; border-radius:999px; cursor:pointer;
+    box-shadow:0 8px 24px rgba(243,193,75,0.3); transition:transform .15s ease, box-shadow .15s ease;
+  }
+  .btn:hover{ transform:translateY(-2px) scale(1.02); box-shadow:0 12px 30px rgba(243,193,75,0.45); }
+  .btn:active{ transform:translateY(0) scale(0.99); }
+  .btn:disabled{ opacity:.5; cursor:default; transform:none; box-shadow:none; }
+  .btn.secondary{ background:transparent; border:2px dashed var(--ice); color:var(--ice); box-shadow:none; }
+
+  /* ================= GAME ================= */
+  #game{
+    background:radial-gradient(ellipse at 50% 30%, #123328 0%, #020a07 70%);
+    color:var(--white);
+    padding-top:5vh; padding-bottom:5vh;
+  }
+  .game-panel{ width:min(820px,96vw); }
+
+  /* --- intro screen --- */
+  #game-intro h2{ font-size:clamp(1.9rem,4.5vw,2.8rem); margin-bottom:14px; }
+  #game-intro p{ max-width:56ch; margin:0 auto; color:var(--ice); font-size:clamp(.98rem,1.6vw,1.12rem); line-height:1.6; }
+  .rules{
+    margin:30px auto 0; max-width:580px; text-align:left;
+    background:rgba(255,255,255,0.06); border-radius:18px; padding:22px 26px;
+  }
+  .rules li{ margin:8px 0; color:var(--ice); font-size:.96rem; list-style:none; padding-left:28px; position:relative; }
+  .rules li::before{ content:"✓"; position:absolute; left:0; color:var(--green); font-weight:800; }
+  .keycap{
+    display:inline-block; background:#020a07; border:1px solid var(--navy-3); border-radius:6px;
+    padding:1px 7px; font-size:.82em; font-weight:700; font-family:"IBM Plex Mono",monospace; color:var(--gold); margin:0 2px;
+  }
+
+  /* --- HUD --- */
+  .hud-row{ display:flex; align-items:center; gap:14px; width:min(680px,96vw); margin:0 auto 12px; flex-wrap:wrap; justify-content:center; }
+  .meter-wrap{ flex:1; min-width:150px; }
+  .meter-label{ font-size:.72rem; letter-spacing:.12em; text-transform:uppercase; color:var(--muted); margin-bottom:4px; text-align:left; }
+  .meter-track{ width:100%; height:11px; background:rgba(255,255,255,0.12); border-radius:99px; overflow:hidden; }
+  .meter-fill{ height:100%; width:100%; transition:width .15s linear, background .3s ease; border-radius:99px; }
+  .hp-fill{ background:var(--green); }
+  .hunger-fill{ background:#ffb454; }
+  .timer-pill{
+    background:rgba(255,255,255,0.08); border-radius:14px; padding:8px 18px; font-weight:700; font-size:1.05rem; color:var(--gold);
+    font-family:"IBM Plex Mono",monospace; min-width:74px; text-align:center;
+  }
+  .score-pill{
+    background:rgba(255,255,255,0.08); border-radius:14px; padding:8px 18px; font-weight:700; font-size:1.05rem; color:var(--ice);
+    font-family:"IBM Plex Mono",monospace; min-width:74px; text-align:center;
+  }
+  .power-pill{
+    background:rgba(120,90,180,0.22); border:1px solid rgba(205,184,232,0.5); border-radius:14px;
+    padding:8px 16px; font-weight:700; font-size:.95rem; color:#e6d9f7; text-align:center;
+    font-family:"IBM Plex Mono",monospace; transition:background .3s ease, border-color .3s ease;
+  }
+  .power-pill.boosted{ background:rgba(62,207,142,0.22); border-color:rgba(62,207,142,0.6); color:#c8f5e0; }
+
+  .abilities-bar{ display:flex; gap:8px; justify-content:center; margin:0 auto 14px; flex-wrap:wrap; width:min(680px,96vw); }
+  .ability-slot{
+    position:relative; width:68px; height:64px; border-radius:14px; background:rgba(255,255,255,0.06);
+    border:2px solid rgba(255,255,255,0.14); display:flex; flex-direction:column; align-items:center; justify-content:center;
+    font-size:1.3rem; overflow:hidden; transition:border-color .2s ease, background .2s ease, transform .1s ease;
+    cursor:pointer; user-select:none; -webkit-tap-highlight-color:transparent;
+  }
+  .ability-slot:active{ transform:scale(0.94); }
+  .ability-slot .key{
+    position:absolute; top:3px; left:6px; font-size:.6rem; font-weight:700; color:var(--muted);
+    font-family:"IBM Plex Mono",monospace;
+  }
+  .ability-slot .name{
+    position:absolute; bottom:3px; font-size:.52rem; font-weight:700; text-transform:uppercase;
+    letter-spacing:.01em; color:var(--muted); white-space:nowrap; font-family:"IBM Plex Mono",monospace;
+  }
+  .ability-slot.active{ border-color:var(--green); background:rgba(62,207,142,0.22); box-shadow:0 0 16px rgba(62,207,142,0.5); }
+
+  /* --- big scrollable world --- */
+  .viewport-wrap{ display:flex; justify-content:center; position:relative; }
+  .viewport{
+    position:relative;
+    width:min(760px,96vw); height:min(480px,68vw);
+    border-radius:22px;
+    background:#dfe6f7;
+    box-shadow:0 0 0 8px #05071a, 0 0 0 12px #2a2f55, 0 24px 50px rgba(0,0,0,0.55);
+    overflow:hidden;
+    touch-action:none;
+    outline:none;
+    cursor:grab;
+  }
+  .viewport.dragging{ cursor:grabbing; }
+  #world{
+    position:absolute; left:0; top:0; will-change:transform;
+    background:
+      radial-gradient(circle at 15% 20%, rgba(255,255,255,0.5), transparent 45%),
+      repeating-linear-gradient(0deg, rgba(120,140,210,0.06) 0px, rgba(120,140,210,0.06) 1px, transparent 1px, transparent 34px),
+      repeating-linear-gradient(90deg, rgba(120,140,210,0.06) 0px, rgba(120,140,210,0.06) 1px, transparent 1px, transparent 34px),
+      linear-gradient(160deg, #e9edff 0%, #cfd8f5 55%, #b7c3ea 100%);
+  }
+  .viewport-vignette{
+    position:absolute; inset:0; pointer-events:none; z-index:6; border-radius:22px;
+    box-shadow:inset 0 0 70px rgba(4,20,15,0.28);
+  }
+
+  .zone{
+    position:absolute; border-radius:50%; display:flex; align-items:center; justify-content:center;
+    font-size:1.7rem; z-index:2; transition:filter .2s ease; will-change:transform;
+  }
+  .zone .zlabel{
+    position:absolute; bottom:6%; font-size:.62rem; font-weight:800; text-transform:uppercase;
+    letter-spacing:.04em; color:rgba(4,20,15,0.55); text-align:center; width:100%;
+  }
+  .zone.shielded{ filter:saturate(0.4) brightness(1.15); }
+  .zone.cold{ background:radial-gradient(circle, rgba(120,180,255,0.55), rgba(120,180,255,0.05)); }
+  .zone.heat{ background:radial-gradient(circle, rgba(255,120,90,0.55), rgba(255,120,90,0.05)); }
+  .zone.dry{ background:radial-gradient(circle, rgba(210,180,110,0.55), rgba(210,180,110,0.05)); }
+  .zone.rad{ background:radial-gradient(circle, rgba(140,220,110,0.55), rgba(140,220,110,0.05)); }
+  .zone.vac{ background:radial-gradient(circle, rgba(150,140,230,0.55), rgba(150,140,230,0.05)); }
+
+
+  .food{
+    position:absolute; width:12px; height:12px; border-radius:50%; z-index:2;
+    background:radial-gradient(circle at 35% 30%, #eafccb, #8fce6a);
+    box-shadow:0 0 6px rgba(140,220,110,0.7);
+    animation:food-pulse 1.6s ease-in-out infinite;
+  }
+  @keyframes food-pulse{ 0%,100%{ transform:scale(1); opacity:.9; } 50%{ transform:scale(1.2); opacity:1; } }
+
+  .enemy{
+    position:absolute; border-radius:50%; z-index:4; will-change:transform;
+    box-shadow:0 4px 10px rgba(0,0,0,0.4); transition:box-shadow .2s ease;
+  }
+  .enemy::before, .enemy::after{
+    content:""; position:absolute; width:18%; height:18%; background:#fff; border-radius:50%; top:28%;
+  }
+  .enemy::before{ left:20%; } .enemy::after{ left:58%; }
+  .enemy.safe{ box-shadow:0 4px 10px rgba(0,0,0,0.4), 0 0 0 3px rgba(62,207,142,0.9); }
+  .enemy.frostmite{ background:radial-gradient(circle at 35% 30%, #d6ecff, #6fa3d8); }
+  .enemy.embernematode{ background:radial-gradient(circle at 35% 30%, #ffcf8a, #c05a2a); border-radius:50%/60%; }
+  .enemy.dustrotifer{ background:radial-gradient(circle at 35% 30%, #e7d3a0, #9c7c46); }
+  .enemy.radbeetle{ background:radial-gradient(circle at 35% 30%, #d4f79a, #6a9c2e); }
+  .enemy.voidwisp{ background:radial-gradient(circle at 35% 30%, #cabdf0, #5c4a9c); }
+
+  .rival{
+    position:absolute; border-radius:50%; z-index:4; will-change:transform;
+    background:radial-gradient(circle at 35% 30%, #cdb8e8, #7a5ba8);
+    box-shadow:0 4px 10px rgba(0,0,0,0.4);
+    transition:box-shadow .25s ease, filter .25s ease;
+  }
+  .rival::before, .rival::after{
+    content:""; position:absolute; width:16%; height:16%; background:#2b2b2b; border-radius:50%; top:30%;
+  }
+  .rival::before{ left:26%; } .rival::after{ left:58%; }
+  .rival.stronger{ box-shadow:0 4px 10px rgba(0,0,0,0.4), 0 0 0 4px rgba(249,97,103,0.95), 0 0 16px rgba(249,97,103,0.7); }
+  .rival.weaker{ box-shadow:0 4px 10px rgba(0,0,0,0.4), 0 0 0 4px rgba(62,207,142,0.95), 0 0 14px rgba(62,207,142,0.7); }
+  .rival-badge{
+    position:absolute; top:-8px; right:-8px; z-index:5; min-width:18px; height:18px; padding:0 3px;
+    border-radius:9px; background:#fff; color:#1a2148; font-size:.62rem; font-weight:800;
+    display:flex; align-items:center; justify-content:center; box-shadow:0 2px 4px rgba(0,0,0,0.35);
+  }
+  .rival-badge.stronger{ background:var(--coral); color:#fff; }
+  .rival-badge.weaker{ background:var(--green); color:#020a07; }
+
+  .player{
+    position:absolute; width:36px; height:36px; border-radius:50%; z-index:5; will-change:transform;
+    background:radial-gradient(circle at 35% 30%, #c3dc99, #7C9760);
+    box-shadow:0 4px 10px rgba(0,0,0,0.3), 0 0 0 3px rgba(255,255,255,0.5);
+    transition:box-shadow .2s ease;
+  }
+  /* SPRITE SWAP NOTE: replace this .player background with a sprite-sheet
+     background-image + background-position swap once art is ready. The JS
+     only sets style.left/top on #player, so swapping the visuals here is safe. */
+  .player::before, .player::after{
+    content:""; position:absolute; width:5px; height:5px; background:#2b2b2b; border-radius:50%; top:10px;
+  }
+  .player::before{ left:9px; } .player::after{ left:21px; }
+  .player.shield-cold{ box-shadow:0 4px 10px rgba(0,0,0,0.3), 0 0 0 4px rgba(120,180,255,0.95), 0 0 14px rgba(120,180,255,0.9); }
+  .player.shield-heat{ box-shadow:0 4px 10px rgba(0,0,0,0.3), 0 0 0 4px rgba(255,120,90,0.95), 0 0 14px rgba(255,120,90,0.9); }
+  .player.shield-dry{ box-shadow:0 4px 10px rgba(0,0,0,0.3), 0 0 0 4px rgba(210,180,110,0.95), 0 0 14px rgba(210,180,110,0.9); }
+  .player.shield-rad{ box-shadow:0 4px 10px rgba(0,0,0,0.3), 0 0 0 4px rgba(140,220,110,0.95), 0 0 14px rgba(140,220,110,0.9); }
+  .player.shield-vac{ box-shadow:0 4px 10px rgba(0,0,0,0.3), 0 0 0 4px rgba(150,140,230,0.95), 0 0 14px rgba(150,140,230,0.9); }
+  .player.hurt{ animation:hurt-shake .3s ease; }
+  @keyframes hurt-shake{ 0%,100%{ transform:translateX(0); } 25%{ transform:translateX(-4px); } 75%{ transform:translateX(4px); } }
+
+  .toast-layer{
+    position:absolute; top:10px; left:50%; transform:translateX(-50%); z-index:9;
+    display:flex; flex-direction:column; gap:6px; align-items:center; pointer-events:none; width:88%;
+  }
+  .toast{
+    background:rgba(4,16,12,0.88); color:#fff; padding:7px 14px; border-radius:99px;
+    font-size:.78rem; font-weight:700; opacity:0; transform:translateY(-8px);
+    transition:opacity .3s ease, transform .3s ease; text-align:center;
+  }
+  .toast.show{ opacity:1; transform:translateY(0); }
+
+  .minimap{
+    position:absolute; top:10px; right:10px; z-index:9;
+    width:110px; height:86px; border-radius:10px; background:rgba(4,12,9,0.55);
+    border:1px solid rgba(255,255,255,0.25); overflow:hidden;
+  }
+  .minimap-dot{ position:absolute; width:7px; height:7px; border-radius:50%; }
+  .minimap-player{ position:absolute; width:6px; height:6px; border-radius:50%; background:#fff; box-shadow:0 0 4px #fff; }
+
+  .event-overlay{
+    position:absolute; inset:0; z-index:7; pointer-events:none; opacity:0; border-radius:22px;
+    transition:opacity .3s ease;
+  }
+  .event-overlay.warn{
+    opacity:1;
+    background:repeating-linear-gradient(45deg, rgba(255,196,0,0.16) 0 14px, transparent 14px 28px);
+    animation:warn-pulse .6s ease-in-out infinite;
+  }
+  .event-overlay.live{ opacity:1; animation:live-pulse .9s ease-in-out infinite; }
+  .event-overlay.live.cold{ background:radial-gradient(circle, transparent 25%, rgba(120,180,255,0.5) 100%); }
+  .event-overlay.live.heat{ background:radial-gradient(circle, transparent 25%, rgba(255,120,90,0.5) 100%); }
+  .event-overlay.live.dry{ background:radial-gradient(circle, transparent 25%, rgba(210,180,110,0.5) 100%); }
+  .event-overlay.live.rad{ background:radial-gradient(circle, transparent 25%, rgba(140,220,110,0.5) 100%); }
+  .event-overlay.live.vac{ background:radial-gradient(circle, transparent 25%, rgba(150,140,230,0.5) 100%); }
+  @keyframes warn-pulse{ 0%,100%{ opacity:.55 } 50%{ opacity:1 } }
+  @keyframes live-pulse{ 0%,100%{ opacity:.6 } 50%{ opacity:.95 } }
+
+  .event-pill{
+    background:rgba(255,196,0,0.18); border:1px solid rgba(255,196,0,0.5); color:#ffdf7a;
+    border-radius:14px; padding:8px 16px; font-weight:800; font-size:.85rem; display:none;
+  }
+  .event-pill.show{ display:inline-block; }
+
+  .ability-slot.event-target{ animation:target-pulse .7s ease-in-out infinite; }
+  @keyframes target-pulse{
+    0%,100%{ box-shadow:0 0 0 0 rgba(255,196,0,0.6); }
+    50%{ box-shadow:0 0 0 8px rgba(255,196,0,0.25); }
+  }
+
+  .arena-hint{ margin-top:14px; color:var(--muted); font-size:.85rem; }
+
+  /* --- end screens --- */
+  #game-end h2{ font-size:clamp(2rem,5vw,3rem); margin-bottom:10px; }
+  #game-end .big-emoji{ font-size:clamp(3rem,7vw,4.5rem); margin-bottom:10px; }
+  .stats-row{ display:flex; gap:16px; justify-content:center; flex-wrap:wrap; margin:24px 0 8px; }
+  .stat-pill{
+    background:rgba(255,255,255,0.08); border-radius:16px; padding:14px 22px; min-width:110px;
+  }
+  .stat-pill .n{ font-size:1.6rem; font-weight:700; color:var(--gold); font-family:"IBM Plex Mono",monospace; }
+  .stat-pill .l{ font-size:.78rem; text-transform:uppercase; letter-spacing:.08em; color:var(--muted); margin-top:2px; }
+
+  .glossary{
+    margin-top:36px; display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr));
+    gap:14px; width:100%;
+  }
+  .glossary .card{ background:rgba(255,255,255,0.07); border-radius:14px; padding:18px; text-align:left; }
+  .glossary .card h3{ font-size:1rem; color:var(--gold); margin-bottom:6px; }
+  .glossary .card p{ font-size:.86rem; color:var(--ice); line-height:1.45; }
+  .glossary .card.got-it{ background:rgba(62,207,142,0.16); }
+  .glossary .card .mark{ float:right; }
+
+  #game-win p, #game-lose p{ color:var(--ice) !important; }
+
+  footer{ background:var(--navy); color:var(--muted); text-align:center; padding:40px 20px; font-size:.85rem; min-height:auto; }
+
+  .hidden{ display:none !important; }
+
+  #game-intro, #game-play, #game-win, #game-lose{ animation:screen-in .4s ease both; }
+  @keyframes screen-in{ from{ opacity:0; transform:translateY(10px); } to{ opacity:1; transform:translateY(0); } }
+</style>
+</head>
+<body>
+
+<div id="progress"></div>
+
+<section id="hero">
+  <div class="eyebrow">Classified Specimen File — Exhibit A</div>
+  <h1 class="serif">Something on Earth<br>Cannot Be Killed.</h1>
+  <p class="sub">What you're about to see is real. No name, no context yet — just the file. Scroll to begin the trials.</p>
+  <div class="scroll-cue"><span></span>SCROLL</div>
+</section>
+
+<section class="trial">
+  <div class="trial-index">TRIAL 01 / 05</div>
+  <div class="icon reveal">❄️</div>
+  <div class="stat reveal">&minus;272°C</div>
+  <div class="label reveal">Colder Than Deep Space</div>
+  <p class="flavor reveal">Its body temperature is dropped to within a single degree of absolute zero — the coldest temperature physics allows. It does not resist. It waits.</p>
+</section>
+
+<section class="trial">
+  <div class="trial-index">TRIAL 02 / 05</div>
+  <div class="icon reveal">🔥</div>
+  <div class="stat reveal">150°C</div>
+  <div class="label reveal">Boiled Past Water's Limit</div>
+  <p class="flavor reveal">Heated far beyond the point where water itself turns to steam. Most life ends in seconds. It does not.</p>
+</section>
+
+<section class="trial">
+  <div class="trial-index">TRIAL 03 / 05</div>
+  <div class="icon reveal">💧</div>
+  <div class="stat reveal">0%</div>
+  <div class="label reveal">Every Drop of Water, Removed</div>
+  <p class="flavor reveal">Dried out completely — reduced to a shriveled husk with no moisture left at all.</p>
+</section>
+
+<section class="trial">
+  <div class="trial-index">TRIAL 04 / 05</div>
+  <div class="icon reveal">☢️</div>
+  <div class="stat reveal">1,000x</div>
+  <div class="label reveal">The Lethal Human Dose, in Radiation</div>
+  <p class="flavor reveal">Bathed in enough radiation to shred the DNA of nearly anything alive. Its own DNA shreds too. It repairs itself and keeps going.</p>
+</section>
+
+<section class="trial">
+  <div class="trial-index">TRIAL 05 / 05</div>
+  <div class="icon reveal">🌌</div>
+  <div class="stat reveal">10 Days</div>
+  <div class="label reveal">Unprotected, in the Vacuum of Space</div>
+  <p class="flavor reveal">No suit. No shield. The open vacuum, direct solar radiation, and cosmic rays — all at once, for over a week.</p>
+</section>
+
+<section id="twist">
+  <div class="line1 reveal">Every trial above has already happened, in real experiments.</div>
+  <div class="line2 reveal">Then, scientists <em>add water.</em></div>
+  <p class="sub reveal" style="margin-top:34px; max-width:44ch;">It gets up. And walks away.</p>
+</section>
+
+<section id="mechanism">
+  <h2 class="serif reveal">The Trick</h2>
+  <p class="reveal">It senses catastrophe coming and pulls its legs in, expelling nearly all of its internal water. It curls into a tough, glassy shape scientists call a <span class="term">tun</span>. In this <span class="term">desiccated</span>, almost <span class="term">ametabolic</span> state — a state called <span class="term">cryptobiosis</span> — its biology simply pauses. Not quite alive. Not quite dead. Waiting. This is what makes it one of biology's most extreme <span class="term">extremophiles</span>: built not to resist hardship, but to disappear from it entirely, until it's safe to come back.</p>
+</section>
+
+<section id="reveal">
+  <div class="creature-emoji reveal">🐻</div>
+  <h2 class="serif reveal">It's a Tardigrade</h2>
+  <p class="reveal">A microscopic, eight-legged "water bear" — one of the toughest animals on Earth. You just read five real vocabulary words that explain HOW it survives. Now YOU are the tardigrade, dropped into a whole world full of danger. Eat to stay alive, learn each survival power, and use the right one at the right moment.</p>
+  <button class="btn reveal" onclick="goToGame()">Become the Tardigrade →</button>
+</section>
+
+<section id="game">
+  <div class="game-panel">
+
+    <!-- INTRO -->
+    <div id="game-intro">
+      <div class="eyebrow" style="color:var(--gold);">Tardigrade Survival Mode</div>
+      <h2 class="serif">Explore. Eat. Survive 90 Seconds.</h2>
+      <p>This is a whole world, not one room — move with <span class="keycap">W</span><span class="keycap">A</span><span class="keycap">S</span><span class="keycap">D</span> or the arrow keys, or click-and-hold (drag on touch), and the view scrolls with you (check the mini-map, top right). You already have all 5 survival powers — your job is just to switch on the <em>right</em> one at the right time. Little green bits of food are scattered everywhere; eat them or you'll starve. Each colored zone is labeled with the real scientific term for what it takes to survive there, and every zone has its own predator guarding it. You'll also run into wild rival tardigrades — each one is bigger and carries a number badge showing its power level, and a red glow means it's stronger than you (it will hunt you), while a green glow means you're stronger (it flees, and catching it is a free meal). Switching any power on boosts your own power level, so it's not just for the zones. Every 15–20 seconds, watch for a random hazard that <em>surges across the entire world</em> too.</p>
+      <ul class="rules">
+        <li>All 5 powers are ready from the start — no searching, no waiting</li>
+        <li>Click a power icon, or press <span class="keycap">1</span>–<span class="keycap">5</span>, to switch it on — press again (or pick another) to switch it off</li>
+        <li>Only one power can be on at a time, so turn it off once you're clear of danger</li>
+        <li>Rival tardigrades: bigger + red glow = stronger, avoid it. Green glow = weaker, eat it for a boost</li>
+        <li>Any active power boosts your own power level — check the 💪 Power readout</li>
+        <li>Eat the small green food dots to keep your Hunger meter up — starve and you start losing HP</li>
+        <li>Watch for the ⚠️ warning banner — a world-wide surge is coming and only one power stops it</li>
+        <li>Keep your HP above zero for the full 90 seconds to win</li>
+      </ul>
+      <button class="btn" onclick="startGame()">Drop Into the World →</button>
+    </div>
+
+    <!-- PLAY -->
+    <div id="game-play" class="hidden">
+      <div class="hud-row">
+        <div class="meter-wrap">
+          <div class="meter-label">HP</div>
+          <div class="meter-track"><div class="meter-fill hp-fill" id="hp-fill"></div></div>
+        </div>
+        <div class="meter-wrap">
+          <div class="meter-label">Hunger</div>
+          <div class="meter-track"><div class="meter-fill hunger-fill" id="hunger-fill"></div></div>
+        </div>
+        <div class="timer-pill" id="timer-pill">90s</div>
+        <div class="score-pill" id="score-pill">0 pts</div>
+        <div class="power-pill" id="power-pill">💪 Power: 2</div>
+        <div class="event-pill" id="event-pill"></div>
+      </div>
+
+      <div class="abilities-bar" id="abilities-bar"></div>
+
+      <div class="viewport-wrap">
+        <div class="viewport" id="viewport" tabindex="0">
+          <div id="world">
+            <div id="zones-layer"></div>
+            <div id="food-layer"></div>
+            <div id="enemies-layer"></div>
+            <div id="rivals-layer"></div>
+            <div class="player" id="player"></div>
+          </div>
+          <div class="viewport-vignette"></div>
+          <div class="event-overlay" id="event-overlay"></div>
+          <div class="toast-layer" id="toast-layer"></div>
+          <div class="minimap" id="minimap"></div>
+        </div>
+      </div>
+      <p class="arena-hint">WASD / arrow keys, or click-and-hold (or drag on touch) to move · click a power icon or press 1–5 to switch it on/off</p>
+    </div>
+
+    <!-- END: WIN -->
+    <div id="game-win" class="hidden">
+      <div class="big-emoji">🏆</div>
+      <h2 class="serif">You Survived the World!</h2>
+      <p>90 seconds of real extreme biology, and you're still moving.</p>
+      <div class="stats-row">
+        <div class="stat-pill"><div class="n" id="win-score">0</div><div class="l">Score</div></div>
+        <div class="stat-pill"><div class="n" id="win-food">0</div><div class="l">Food Eaten</div></div>
+        <div class="stat-pill"><div class="n" id="win-rivals">0</div><div class="l">Rivals Outpowered</div></div>
+        <div class="stat-pill"><div class="n" id="win-powers">0/5</div><div class="l">Powers Used</div></div>
+        <div class="stat-pill"><div class="n" id="win-countered">0/5</div><div class="l">Predators Outsmarted</div></div>
+      </div>
+      <div class="glossary" id="glossary-win"></div>
+      <button class="btn" onclick="startGame()">Play Again ↻</button>
+    </div>
+
+    <!-- END: LOSE -->
+    <div id="game-lose" class="hidden">
+      <div class="big-emoji">🧬</div>
+      <h2 class="serif">The World Got You — Try Again!</h2>
+      <p>Even real tardigrades don't survive every trial. Here's what each power does:</p>
+      <div class="stats-row">
+        <div class="stat-pill"><div class="n" id="lose-time">0s</div><div class="l">Time Survived</div></div>
+        <div class="stat-pill"><div class="n" id="lose-score">0</div><div class="l">Score</div></div>
+        <div class="stat-pill"><div class="n" id="lose-food">0</div><div class="l">Food Eaten</div></div>
+        <div class="stat-pill"><div class="n" id="lose-rivals">0</div><div class="l">Rivals Outpowered</div></div>
+      </div>
+      <div class="glossary" id="glossary-lose"></div>
+      <button class="btn" onclick="startGame()">Try Again ↻</button>
+    </div>
+
+  </div>
+</section>
+
+<footer>
+  Exhibit A &middot; Tardigrade Survival Mode &middot; built to make five real science words actually stick
+</footer>
+
+<script>
+  // scroll progress bar
+  window.addEventListener('scroll', function(){
+    var h = document.documentElement;
+    var scrolled = (h.scrollTop) / (h.scrollHeight - h.clientHeight) * 100;
+    document.getElementById('progress').style.width = scrolled + '%';
+  });
+
+  // fade-in on scroll
+  var observer = new IntersectionObserver(function(entries){
+    entries.forEach(function(entry){
+      if(entry.isIntersecting){ entry.target.classList.add('visible'); }
+    });
+  }, { threshold: 0.2 });
+  document.querySelectorAll('.reveal').forEach(function(el){ observer.observe(el); });
+
+  function goToGame(){
+    document.getElementById('game').scrollIntoView({ behavior:'smooth' });
+  }
+
+  /* ============ GAME DATA ============
+     5 biomes scattered across a big world. Each has: a hazard zone labeled
+     with its real scientific term, and a resident predator that only the
+     matching survival power can neutralize. All 5 powers are available from
+     the start — only one can be switched on at a time. Small food dots are
+     scattered everywhere and must be eaten to avoid starving.
+  */
+  var HAZARDS = [
+    {
+      key:'cryptobiosis', slot:1, zoneClass:'cold', shieldClass:'shield-cold', icon:'❄️', pickupIcon:'💤', mapColor:'#7ab4ff',
+      term:'Cryptobiosis', shortName:'CRYPTO', hazardName:'Extreme Cold (−272°C)',
+      biome:{ x:340, y:320 },
+      patrol:{ radius:140, period:22, phase:0 },
+      enemy:{ type:'frostmite', label:'Frost Mite', r:15, speed:88, chaseRadius:190, damage:14, hitCooldownMs:900, graceMs:3500, leash:260 },
+      def:'A reversible state where an organism’s metabolism drops to nearly undetectable levels in response to extreme conditions.',
+      why:'Dropping your metabolism to nearly zero leaves almost nothing running for the cold to damage.'
+    },
+    {
+      key:'desiccation', slot:2, zoneClass:'heat', shieldClass:'shield-heat', icon:'🔥', pickupIcon:'💧', mapColor:'#ff785a',
+      term:'Desiccation', shortName:'DESICC', hazardName:'Extreme Heat (150°C)',
+      biome:{ x:1460, y:320 },
+      patrol:{ radius:170, period:18, phase:1.2566 },
+      enemy:{ type:'embernematode', label:'Ember Worm', r:13, speed:118, chaseRadius:210, damage:10, hitCooldownMs:850, graceMs:4000, leash:260, wavy:true },
+      def:'The process of removing nearly all water from a cell or organism.',
+      why:'Forcing the water out of your body first means there’s nothing left inside to boil.'
+    },
+    {
+      key:'tun', slot:3, zoneClass:'dry', shieldClass:'shield-dry', icon:'💧', pickupIcon:'🔘', mapColor:'#d2b46e',
+      term:'Tun State', shortName:'TUN', hazardName:'Total Drought (0% Water)',
+      biome:{ x:340, y:1100 },
+      patrol:{ radius:120, period:26, phase:2.5133 },
+      enemy:{ type:'dustrotifer', label:'Dust Rotifer', r:17, speed:68, chaseRadius:170, damage:16, hitCooldownMs:1100, graceMs:5000, leash:250 },
+      def:'The dried, curled-up shape a tardigrade forms when entering cryptobiosis.',
+      why:'Curling into a tough, glassy tun locks your dried-out body into a stable shape until water returns.'
+    },
+    {
+      key:'extremophile', slot:4, zoneClass:'rad', shieldClass:'shield-rad', icon:'☢️', pickupIcon:'🏅', mapColor:'#8cdc6e',
+      term:'Extremophile', shortName:'EXTREMO', hazardName:'Lethal Radiation (1,000x)',
+      biome:{ x:1460, y:1100 },
+      patrol:{ radius:160, period:20, phase:3.7699 },
+      enemy:{ type:'radbeetle', label:'Rad Beetle', r:16, speed:98, chaseRadius:220, damage:12, hitCooldownMs:900, graceMs:4500, leash:270 },
+      def:'An organism that thrives in conditions most life can’t survive.',
+      why:'As an extremophile, your body is built to repair shredded DNA faster than the radiation can wreck it.'
+    },
+    {
+      key:'ametabolic', slot:5, zoneClass:'vac', shieldClass:'shield-vac', icon:'🌌', pickupIcon:'⏸️', mapColor:'#9690e6',
+      term:'Ametabolic', shortName:'AMETAB', hazardName:'Open Vacuum (Space)',
+      biome:{ x:900, y:710 },
+      patrol:{ radius:100, period:30, phase:5.0265 },
+      enemy:{ type:'voidwisp', label:'Void Wisp', r:18, speed:56, chaseRadius:200, damage:18, hitCooldownMs:1300, graceMs:6000, leash:240 },
+      def:'A state with no detectable metabolic activity — biology, paused.',
+      why:'Going fully ametabolic stops every trace of detectable metabolism, so there’s nothing active for the vacuum to disrupt.'
+    }
+  ];
+
+  var WORLD_W = 1800, WORLD_H = 1400;
+  var GAME_TIME = 90;             // seconds to survive
+  var ZONE_DPS = 16;               // hp/sec lost while unprotected in a zone
+  var PLAYER_SPEED = 230;          // px/sec
+  var ENEMY_WANDER_FACTOR = 0.45;   // wander speed = speed * this, when not chasing
+
+  /* World Events: periodically the WHOLE map suffers one random hazard for a
+     few seconds, no matter where you're standing — a telegraphed 3s warning
+     gives you time to find the matching key and hit it. */
+  var EVENT_FIRST_DELAY_MS = 16000;
+  var EVENT_MIN_GAP_MS = 14000;
+  var EVENT_MAX_GAP_MS = 19000;
+  var EVENT_WARNING_MS = 3000;
+  var EVENT_DURATION_MS = 4500;
+  var EVENT_DPS = 20;
+
+  var HUNGER_MAX = 100;
+  var HUNGER_DRAIN_PER_SEC = 1.3;
+  var STARVE_DPS = 9;              // hp/sec lost while hunger is at 0
+  var FOOD_HUNGER_GAIN = 15;
+  var FOOD_SCORE = 4;
+  var FOOD_TARGET_COUNT = 40;
+  var FOOD_RESPAWN_BATCH = 4;
+  var FOOD_RESPAWN_EVERY_S = 5;
+  var FOOD_R = 6;
+
+  var PLAYER_R = 18;
+  var ZONE_R = 125;
+
+  /* Rival tardigrades: roaming wild tardigrades, each with a random power
+     level (1-5) shown as size + a badge + a colored ring. Your own power is
+     a base level that gets a boost while any survival power is switched on
+     — that's the payoff for using your powers beyond just the 5 zones. A
+     rival stronger than you hunts you down; a rival your level or weaker
+     flees, and catching it means a free meal. */
+  var PLAYER_BASE_POWER = 2;
+  var PLAYER_BOOST_POWER = 2;      // added to base while any ability is active
+  var RIVAL_MIN_POWER = 1, RIVAL_MAX_POWER = 5;
+  var RIVAL_TARGET_COUNT = 7;
+  var RIVAL_BASE_R = 14;
+  var RIVAL_R_PER_POWER = 5.5;      // bigger power level = visibly bigger rival
+  var RIVAL_BASE_SPEED = 118;        // weaker rivals are quicker...
+  var RIVAL_SPEED_PER_POWER = -9;    // ...stronger ones are slower but hit harder
+  var RIVAL_CHASE_RADIUS = 210;
+  var RIVAL_FLEE_RADIUS = 190;
+  var RIVAL_WANDER_FACTOR = 0.4;
+  var RIVAL_DAMAGE_BASE = 6;
+  var RIVAL_DAMAGE_PER_POWER = 4;
+  var RIVAL_HIT_COOLDOWN_MS = 1000;
+  var RIVAL_START_GRACE_S = 3;      // no rival damage in the first few seconds of a run
+  var RIVAL_EAT_HUNGER_GAIN = 20;
+  var RIVAL_EAT_SCORE = 30;
+
+  var state = null;
+  var rafId = null;
+  var keys = {};
+
+  function dist(x1,y1,x2,y2){ var dx=x1-x2, dy=y1-y2; return Math.sqrt(dx*dx+dy*dy); }
+
+  function clampToWorld(x, y, r){
+    return { x: Math.min(Math.max(x, r), WORLD_W - r), y: Math.min(Math.max(y, r), WORLD_H - r) };
+  }
+
+  function clampToCircle(x, y, cx, cy, r){
+    var dx = x - cx, dy = y - cy;
+    var d = Math.sqrt(dx*dx + dy*dy);
+    if(d > r && d > 0){
+      var scale = r / d;
+      return { x: cx + dx*scale, y: cy + dy*scale };
+    }
+    return { x:x, y:y };
+  }
+
+  function buildLayout(){
+    return HAZARDS.map(function(h){
+      return {
+        key:h.key, x:h.biome.x, y:h.biome.y, r:ZONE_R, zoneClass:h.zoneClass, icon:h.icon, label:h.term,
+        baseX:h.biome.x, baseY:h.biome.y, patrol:h.patrol
+      };
+    });
+  }
+
+  function buildEnemies(){
+    var now = performance.now();
+    return HAZARDS.map(function(h, i){
+      var e = h.enemy;
+      return {
+        id:'enemy-' + i, key:h.key, type:e.type, r:e.r, speed:e.speed, chaseRadius:e.chaseRadius,
+        damage:e.damage, hitCooldownMs:e.hitCooldownMs, wavy: !!e.wavy, leash:e.leash,
+        homeX:h.biome.x, homeY:h.biome.y,
+        x:h.biome.x, y:h.biome.y, wanderAngle: Math.random() * Math.PI * 2, wanderTimer: 0, waveT: 0,
+        graceUntil: now + e.graceMs, hitCooldownUntil: 0
+      };
+    });
+  }
+
+  function isInsideAnyZone(x, y, margin){
+    for(var i = 0; i < state.zones.length; i++){
+      var z = state.zones[i];
+      if(dist(x,y,z.x,z.y) < z.r + margin) return true;
+    }
+    return false;
+  }
+
+  function randomFoodSpot(){
+    for(var tries = 0; tries < 30; tries++){
+      var x = 50 + Math.random() * (WORLD_W - 100);
+      var y = 50 + Math.random() * (WORLD_H - 100);
+      if(!isInsideAnyZone(x, y, 40)) return { x:x, y:y };
+    }
+    return { x:100, y:100 };
+  }
+
+  function buildFood(count){
+    var food = [];
+    for(var i = 0; i < count; i++){
+      var p = randomFoodSpot();
+      food.push({ id:'food-' + (state.foodIdCounter++), x:p.x, y:p.y, r:FOOD_R });
+    }
+    return food;
+  }
+
+  function getPlayerPower(){
+    var anyActive = HAZARDS.some(function(h){ return state.abilities[h.key].active; });
+    return PLAYER_BASE_POWER + (anyActive ? PLAYER_BOOST_POWER : 0);
+  }
+
+  function makeRival(){
+    var p = randomFoodSpot();
+    var power = RIVAL_MIN_POWER + Math.floor(Math.random() * (RIVAL_MAX_POWER - RIVAL_MIN_POWER + 1));
+    return {
+      id:'rival-' + (state.rivalIdCounter++),
+      power:power,
+      r: RIVAL_BASE_R + power * RIVAL_R_PER_POWER,
+      speed: Math.max(40, RIVAL_BASE_SPEED + power * RIVAL_SPEED_PER_POWER),
+      x:p.x, y:p.y,
+      wanderAngle: Math.random() * Math.PI * 2, wanderTimer: 0,
+      hitCooldownUntil: 0, lastToastAt: 0
+    };
+  }
+
+  function buildRivals(count){
+    var rivals = [];
+    for(var i = 0; i < count; i++) rivals.push(makeRival());
+    return rivals;
+  }
+
+  function startGame(){
+    document.getElementById('game-intro').classList.add('hidden');
+    document.getElementById('game-win').classList.add('hidden');
+    document.getElementById('game-lose').classList.add('hidden');
+    document.getElementById('game-play').classList.remove('hidden');
+
+    var abilities = {};
+    HAZARDS.forEach(function(h){
+      abilities[h.key] = { active:false };
+    });
+
+    state = {
+      hp:100,
+      hunger:HUNGER_MAX,
+      timeLeft: GAME_TIME,
+      running:true,
+      lastTs: null,
+      zones: buildLayout(),
+      abilities: abilities,
+      learned: {},
+      countered: {},
+      player: { x:900, y:180, vx:0, vy:0 },
+      camera: { x:900, y:180 },
+      pointerDir: null,
+      pointerActive: false,
+      enemies: buildEnemies(),
+      score:0,
+      foodEaten:0,
+      foodIdCounter:0,
+      foodRespawnTimer: FOOD_RESPAWN_EVERY_S,
+      rivalIdCounter:0,
+      rivalsEaten:0,
+      elapsed:0,
+      nextEventAt: performance.now() + EVENT_FIRST_DELAY_MS,
+      eventWarned: false,
+      pendingEventKey: null,
+      activeEvent: null,
+      toasts: []
+    };
+    state.food = buildFood(FOOD_TARGET_COUNT);
+    state.rivals = buildRivals(RIVAL_TARGET_COUNT);
+
+    var viewport = document.getElementById('viewport');
+    var rect = viewport.getBoundingClientRect();
+    state.viewW = rect.width;
+    state.viewH = rect.height;
+    state.camera.x = Math.min(Math.max(state.player.x, state.viewW/2), WORLD_W - state.viewW/2);
+    state.camera.y = Math.min(Math.max(state.player.y, state.viewH/2), WORLD_H - state.viewH/2);
+
+    var world = document.getElementById('world');
+    world.style.width = WORLD_W + 'px';
+    world.style.height = WORLD_H + 'px';
+
+    // zones start already offset along their patrol path (elapsed=0), and
+    // guardians should spawn already sitting on that offset position
+    updateZones();
+    state.enemies.forEach(function(e){ e.x = e.homeX; e.y = e.homeY; });
+    updateCamera(1); // dt=1 forces an instant snap to the initial target, no drift-in
+
+    renderAbilitiesBar();
+    renderZones();
+    renderEnemies();
+    renderFood();
+    renderRivals();
+    renderMinimap();
+    document.getElementById('hp-fill').style.width = '100%';
+    document.getElementById('hp-fill').style.background = 'var(--green)';
+    document.getElementById('hunger-fill').style.width = '100%';
+    document.getElementById('timer-pill').textContent = GAME_TIME + 's';
+    document.getElementById('score-pill').textContent = '0 pts';
+    render(); // paint the correct initial positions before the first rAF tick
+
+    viewport.focus();
+
+    cancelAnimationFrame(rafId);
+    state.lastTs = null;
+    rafId = requestAnimationFrame(loop);
+  }
+
+  window.addEventListener('resize', function(){
+    if(!state || !state.running) return;
+    var rect = document.getElementById('viewport').getBoundingClientRect();
+    state.viewW = rect.width;
+    state.viewH = rect.height;
+  });
+
+  function renderAbilitiesBar(){
+    var bar = document.getElementById('abilities-bar');
+    bar.innerHTML = '';
+    HAZARDS.forEach(function(h){
+      var slot = document.createElement('div');
+      slot.className = 'ability-slot';
+      slot.id = 'slot-' + h.key;
+      slot.title = h.term + ' — protects against ' + h.hazardName;
+      slot.innerHTML =
+        '<span class="key">' + h.slot + '</span>' +
+        '<span class="ico">' + h.pickupIcon + '</span>' +
+        '<span class="name">' + h.shortName + '</span>';
+      slot.addEventListener('click', function(){ toggleAbility(h.slot); });
+      bar.appendChild(slot);
+    });
+  }
+
+  function renderZones(){
+    var zLayer = document.getElementById('zones-layer');
+    zLayer.innerHTML = '';
+    state.zones.forEach(function(z){
+      var el = document.createElement('div');
+      el.className = 'zone ' + z.zoneClass;
+      el.id = 'zone-' + z.key;
+      el.style.width = (z.r*2)+'px';
+      el.style.height = (z.r*2)+'px';
+      el.innerHTML = z.icon + '<span class="zlabel">' + z.label + '</span>';
+      zLayer.appendChild(el);
+      positionSprite(el.id, z.x, z.y, z.r);
+    });
+  }
+
+  function renderEnemies(){
+    var layer = document.getElementById('enemies-layer');
+    layer.innerHTML = '';
+    state.enemies.forEach(function(e){
+      var el = document.createElement('div');
+      el.className = 'enemy ' + e.type;
+      el.id = e.id;
+      el.style.width = (e.r*2)+'px';
+      el.style.height = (e.r*2)+'px';
+      layer.appendChild(el);
+    });
+  }
+
+  function renderFood(){
+    var layer = document.getElementById('food-layer');
+    layer.innerHTML = '';
+    state.food.forEach(function(f){
+      var el = document.createElement('div');
+      el.className = 'food';
+      el.id = f.id;
+      el.style.width = (f.r*2)+'px';
+      el.style.height = (f.r*2)+'px';
+      el.style.left = (f.x - f.r)+'px';
+      el.style.top = (f.y - f.r)+'px';
+      layer.appendChild(el);
+    });
+  }
+
+  function renderRivals(){
+    var layer = document.getElementById('rivals-layer');
+    layer.innerHTML = '';
+    state.rivals.forEach(function(r){ appendRivalEl(layer, r); });
+  }
+
+  function appendRivalEl(layer, r){
+    var el = document.createElement('div');
+    el.className = 'rival';
+    el.id = r.id;
+    el.style.width = (r.r*2)+'px';
+    el.style.height = (r.r*2)+'px';
+    var badge = document.createElement('div');
+    badge.className = 'rival-badge';
+    badge.id = r.id + '-badge';
+    badge.textContent = r.power;
+    el.appendChild(badge);
+    layer.appendChild(el);
+    positionSprite(r.id, r.x, r.y, r.r);
+  }
+
+  function renderMinimap(){
+    var map = document.getElementById('minimap');
+    map.innerHTML = '';
+    var mw = map.clientWidth || 110, mh = map.clientHeight || 86;
+    var sx = mw / WORLD_W, sy = mh / WORLD_H;
+    state.zones.forEach(function(z){
+      var dot = document.createElement('div');
+      dot.className = 'minimap-dot';
+      var h = HAZARDS.filter(function(hz){ return hz.key === z.key; })[0];
+      dot.style.background = h.mapColor;
+      dot.style.left = (z.x*sx - 3.5) + 'px';
+      dot.style.top = (z.y*sy - 3.5) + 'px';
+      map.appendChild(dot);
+    });
+    var pdot = document.createElement('div');
+    pdot.className = 'minimap-player';
+    pdot.id = 'minimap-player';
+    map.appendChild(pdot);
+  }
+
+  function positionSprite(id, x, y, r){
+    var el = document.getElementById(id);
+    if(el) el.style.transform = 'translate3d(' + (x - r) + 'px,' + (y - r) + 'px,0)';
+  }
+
+  function updateCamera(dt){
+    var halfW = state.viewW / 2, halfH = state.viewH / 2;
+    var targetX = Math.min(Math.max(state.player.x, halfW), WORLD_W - halfW);
+    var targetY = Math.min(Math.max(state.player.y, halfH), WORLD_H - halfH);
+    var ease = Math.min(1, dt * 9);
+    state.camera.x += (targetX - state.camera.x) * ease;
+    state.camera.y += (targetY - state.camera.y) * ease;
+    var world = document.getElementById('world');
+    world.style.transform = 'translate3d(' + (halfW - state.camera.x) + 'px,' + (halfH - state.camera.y) + 'px,0)';
+  }
+
+  window.addEventListener('keydown', function(e){
+    if(!state || !state.running) return;
+    var k = e.key.toLowerCase();
+    if(['w','a','s','d','arrowup','arrowdown','arrowleft','arrowright'].indexOf(k) !== -1){
+      keys[k] = true;
+      e.preventDefault();
+    }
+    if(k >= '1' && k <= '5'){
+      toggleAbility(parseInt(k,10));
+      e.preventDefault();
+    }
+  });
+  window.addEventListener('keyup', function(e){
+    var k = e.key.toLowerCase();
+    if(keys.hasOwnProperty(k)) keys[k] = false;
+  });
+
+  // Click-and-hold (mouse) or drag (touch) as a movement option alongside
+  // WASD — point away from the tardigrade and hold to walk that direction.
+  function setPointerDirFromEvent(e){
+    var viewport = document.getElementById('viewport');
+    var rect = viewport.getBoundingClientRect();
+    var px = e.clientX - rect.left, py = e.clientY - rect.top;
+    var cx = state.viewW / 2, cy = state.viewH / 2;
+    var dx = px - cx, dy = py - cy;
+    var d = Math.sqrt(dx*dx + dy*dy);
+    if(d < 12){ state.pointerDir = null; return; } // dead zone near center
+    state.pointerDir = { x: dx / d, y: dy / d };
+  }
+  (function(){
+    var viewport = document.getElementById('viewport');
+    viewport.addEventListener('pointerdown', function(e){
+      if(!state || !state.running) return;
+      state.pointerActive = true;
+      viewport.classList.add('dragging');
+      setPointerDirFromEvent(e);
+      e.preventDefault();
+    });
+    window.addEventListener('pointermove', function(e){
+      if(!state || !state.pointerActive) return;
+      setPointerDirFromEvent(e);
+    });
+    window.addEventListener('pointerup', function(){
+      if(state){ state.pointerActive = false; state.pointerDir = null; }
+      viewport.classList.remove('dragging');
+    });
+  })();
+
+  function toggleAbility(slotNum){
+    var h = HAZARDS.filter(function(hz){ return hz.slot === slotNum; })[0];
+    if(!h) return;
+    var a = state.abilities[h.key];
+
+    if(a.active){
+      a.active = false;
+      pushToast(h.term + ' turned off.');
+      return;
+    }
+
+    // only one power can be on at a time — that's the whole decision the
+    // game is asking you to make, so switching powers off is automatic
+    HAZARDS.forEach(function(hz){ state.abilities[hz.key].active = false; });
+    a.active = true;
+    state.learned[h.key] = true;
+    pushToast(h.term + ' ON — protects you from ' + h.hazardName + '.');
+  }
+
+  function pushToast(text){
+    var layer = document.getElementById('toast-layer');
+    var el = document.createElement('div');
+    el.className = 'toast';
+    el.textContent = text;
+    layer.appendChild(el);
+    requestAnimationFrame(function(){ el.classList.add('show'); });
+    setTimeout(function(){
+      el.classList.remove('show');
+      setTimeout(function(){ el.remove(); }, 300);
+    }, 2200);
+    while(layer.children.length > 3){ layer.removeChild(layer.firstChild); }
+  }
+
+  function loop(ts){
+    if(!state || !state.running) return;
+    if(state.lastTs === null) state.lastTs = ts;
+    var dt = Math.min((ts - state.lastTs) / 1000, 0.05);
+    state.lastTs = ts;
+    state.elapsed += dt;
+
+    updateTimer(dt);
+    updateZones();
+    updatePlayer(dt);
+    updateEnemies(dt);
+    updateRivals(dt);
+    updateHunger(dt);
+    updateWorldEvent(dt);
+    checkFood();
+    checkZones(dt);
+    checkEnemyContacts();
+    checkRivalContacts();
+    maybeRespawnFood(dt);
+    render();
+
+    if(state.hp <= 0){
+      state.hp = 0;
+      render();
+      return endGame(false);
+    }
+    if(state.timeLeft <= 0){
+      return endGame(true);
+    }
+    rafId = requestAnimationFrame(loop);
+  }
+
+  function updateTimer(dt){
+    state.timeLeft -= dt;
+    if(state.timeLeft < 0) state.timeLeft = 0;
+    document.getElementById('timer-pill').textContent = Math.ceil(state.timeLeft) + 's';
+    document.getElementById('score-pill').textContent = state.score + ' pts';
+  }
+
+  function updateHunger(dt){
+    state.hunger -= HUNGER_DRAIN_PER_SEC * dt;
+    if(state.hunger < 0) state.hunger = 0;
+    if(state.hunger <= 0){
+      state.hp -= STARVE_DPS * dt;
+    }
+  }
+
+  function updatePlayer(dt){
+    var vx = 0, vy = 0;
+    if(keys['w'] || keys['arrowup']) vy -= 1;
+    if(keys['s'] || keys['arrowdown']) vy += 1;
+    if(keys['a'] || keys['arrowleft']) vx -= 1;
+    if(keys['d'] || keys['arrowright']) vx += 1;
+
+    if(vx === 0 && vy === 0 && state.pointerDir){
+      vx = state.pointerDir.x; vy = state.pointerDir.y;
+    }
+
+    var p = state.player;
+    var targetVx = 0, targetVy = 0;
+    if(vx !== 0 || vy !== 0){
+      var len = Math.sqrt(vx*vx + vy*vy);
+      targetVx = (vx / len) * PLAYER_SPEED;
+      targetVy = (vy / len) * PLAYER_SPEED;
+    }
+    // ease actual velocity toward the target instead of snapping — removes the
+    // robotic instant-stop/instant-start feel while staying responsive
+    var accel = Math.min(1, dt * 14);
+    p.vx += (targetVx - p.vx) * accel;
+    p.vy += (targetVy - p.vy) * accel;
+    if(Math.abs(p.vx) < 0.5) p.vx = 0;
+    if(Math.abs(p.vy) < 0.5) p.vy = 0;
+
+    var nx = p.x + p.vx * dt;
+    var ny = p.y + p.vy * dt;
+    var clamped = clampToWorld(nx, ny, PLAYER_R);
+    p.x = clamped.x; p.y = clamped.y;
+
+    updateCamera(dt);
+  }
+
+  function updateZones(){
+    state.zones.forEach(function(z){
+      if(!z.patrol) return;
+      var angle = z.patrol.phase + (state.elapsed / z.patrol.period) * Math.PI * 2;
+      z.x = z.baseX + Math.cos(angle) * z.patrol.radius;
+      z.y = z.baseY + Math.sin(angle) * z.patrol.radius;
+    });
+    // guardians stay leashed to their zone's CURRENT position, not its original spot
+    state.enemies.forEach(function(e){
+      var z = state.zones.filter(function(zz){ return zz.key === e.key; })[0];
+      if(z){ e.homeX = z.x; e.homeY = z.y; }
+    });
+  }
+
+  function updateEnemies(dt){
+    var p = state.player;
+    state.enemies.forEach(function(e){
+      var dx = p.x - e.x, dy = p.y - e.y;
+      var d = Math.sqrt(dx*dx + dy*dy);
+      var inGrace = performance.now() < e.graceUntil;
+      var moveX = 0, moveY = 0;
+      if(!inGrace && d < e.chaseRadius && d > 0.01){
+        var ux = dx / d, uy = dy / d;
+        if(e.wavy){
+          e.waveT += dt * 4;
+          var perpX = -uy, perpY = ux;
+          var wob = Math.sin(e.waveT) * 0.6;
+          ux += perpX * wob; uy += perpY * wob;
+          var norm = Math.sqrt(ux*ux + uy*uy) || 1;
+          ux /= norm; uy /= norm;
+        }
+        moveX = ux * e.speed * dt;
+        moveY = uy * e.speed * dt;
+      } else {
+        e.wanderTimer -= dt;
+        if(e.wanderTimer <= 0){
+          e.wanderAngle = Math.random() * Math.PI * 2;
+          e.wanderTimer = 1.5 + Math.random() * 1.5;
+        }
+        moveX = Math.cos(e.wanderAngle) * e.speed * ENEMY_WANDER_FACTOR * dt;
+        moveY = Math.sin(e.wanderAngle) * e.speed * ENEMY_WANDER_FACTOR * dt;
+      }
+      var nx = e.x + moveX, ny = e.y + moveY;
+      var leashed = clampToCircle(nx, ny, e.homeX, e.homeY, e.leash);
+      var clamped = clampToWorld(leashed.x, leashed.y, e.r);
+      e.x = clamped.x; e.y = clamped.y;
+    });
+  }
+
+
+  function checkFood(){
+    var p = state.player;
+    for(var i = state.food.length - 1; i >= 0; i--){
+      var f = state.food[i];
+      if(dist(p.x,p.y,f.x,f.y) < PLAYER_R + f.r){
+        state.food.splice(i, 1);
+        state.foodEaten++;
+        state.score += FOOD_SCORE;
+        state.hunger = Math.min(HUNGER_MAX, state.hunger + FOOD_HUNGER_GAIN);
+        var el = document.getElementById(f.id);
+        if(el) el.remove();
+      }
+    }
+  }
+
+  function maybeRespawnFood(dt){
+    state.foodRespawnTimer -= dt;
+    if(state.foodRespawnTimer <= 0){
+      state.foodRespawnTimer = FOOD_RESPAWN_EVERY_S;
+      if(state.food.length < FOOD_TARGET_COUNT){
+        var layer = document.getElementById('food-layer');
+        var toAdd = Math.min(FOOD_RESPAWN_BATCH, FOOD_TARGET_COUNT - state.food.length);
+        for(var i = 0; i < toAdd; i++){
+          var p = randomFoodSpot();
+          var f = { id:'food-' + (state.foodIdCounter++), x:p.x, y:p.y, r:FOOD_R };
+          state.food.push(f);
+          var el = document.createElement('div');
+          el.className = 'food';
+          el.id = f.id;
+          el.style.width = (f.r*2)+'px';
+          el.style.height = (f.r*2)+'px';
+          el.style.left = (f.x - f.r)+'px';
+          el.style.top = (f.y - f.r)+'px';
+          layer.appendChild(el);
+        }
+      }
+    }
+  }
+
+  function updateRivals(dt){
+    var p = state.player;
+    var playerPower = getPlayerPower();
+    var inStartGrace = state.elapsed < RIVAL_START_GRACE_S;
+    state.rivals.forEach(function(r){
+      var dx = p.x - r.x, dy = p.y - r.y;
+      var d = Math.sqrt(dx*dx + dy*dy);
+      var strongerThanPlayer = r.power > playerPower;
+      var moveX = 0, moveY = 0;
+
+      if(!inStartGrace && strongerThanPlayer && d < RIVAL_CHASE_RADIUS && d > 0.01){
+        moveX = (dx/d) * r.speed * dt; moveY = (dy/d) * r.speed * dt; // hunts you
+      } else if(!inStartGrace && !strongerThanPlayer && d < RIVAL_FLEE_RADIUS && d > 0.01){
+        moveX = -(dx/d) * r.speed * dt; moveY = -(dy/d) * r.speed * dt; // flees you
+      } else {
+        r.wanderTimer -= dt;
+        if(r.wanderTimer <= 0){
+          r.wanderAngle = Math.random() * Math.PI * 2;
+          r.wanderTimer = 1.5 + Math.random() * 1.5;
+        }
+        moveX = Math.cos(r.wanderAngle) * r.speed * RIVAL_WANDER_FACTOR * dt;
+        moveY = Math.sin(r.wanderAngle) * r.speed * RIVAL_WANDER_FACTOR * dt;
+      }
+
+      var clamped = clampToWorld(r.x + moveX, r.y + moveY, r.r);
+      r.x = clamped.x; r.y = clamped.y;
+    });
+  }
+
+  function respawnRival(oldId){
+    var layer = document.getElementById('rivals-layer');
+    var old = document.getElementById(oldId);
+    if(old) old.remove();
+    var fresh = makeRival();
+    state.rivals.push(fresh);
+    appendRivalEl(layer, fresh);
+  }
+
+  function checkRivalContacts(){
+    if(state.elapsed < RIVAL_START_GRACE_S) return;
+    var now = performance.now();
+    var p = state.player;
+    var playerPower = getPlayerPower();
+    for(var i = state.rivals.length - 1; i >= 0; i--){
+      var r = state.rivals[i];
+      if(dist(p.x,p.y,r.x,r.y) >= PLAYER_R + r.r) continue;
+
+      if(r.power > playerPower){
+        if(now < r.hitCooldownUntil) continue;
+        state.hp -= RIVAL_DAMAGE_BASE + r.power * RIVAL_DAMAGE_PER_POWER;
+        r.hitCooldownUntil = now + RIVAL_HIT_COOLDOWN_MS;
+        var pel = document.getElementById('player');
+        pel.classList.remove('hurt'); void pel.offsetWidth; pel.classList.add('hurt');
+        if(!r.lastToastAt || now - r.lastToastAt > 4000){
+          r.lastToastAt = now;
+          pushToast('A power ' + r.power + ' rival tardigrade got you — you\'re only power ' + playerPower + '!');
+        }
+      } else {
+        state.rivals.splice(i, 1);
+        state.rivalsEaten++;
+        state.score += RIVAL_EAT_SCORE;
+        state.hunger = Math.min(HUNGER_MAX, state.hunger + RIVAL_EAT_HUNGER_GAIN);
+        pushToast('You out-powered a rival tardigrade! +' + RIVAL_EAT_SCORE + ' pts');
+        respawnRival(r.id);
+      }
+    }
+  }
+
+  function updateWorldEvent(dt){
+    var now = performance.now();
+
+    if(state.activeEvent){
+      if(now >= state.activeEvent.endsAt){
+        state.activeEvent = null;
+        state.eventWarned = false;
+        state.pendingEventKey = null;
+        state.nextEventAt = now + EVENT_MIN_GAP_MS + Math.random() * (EVENT_MAX_GAP_MS - EVENT_MIN_GAP_MS);
+        pushToast('The surge has passed.');
+      } else if(!state.abilities[state.activeEvent.key].active){
+        state.hp -= EVENT_DPS * dt;
+      }
+      return;
+    }
+
+    if(!state.eventWarned && now >= state.nextEventAt - EVENT_WARNING_MS){
+      state.eventWarned = true;
+      var pick = HAZARDS[Math.floor(Math.random() * HAZARDS.length)];
+      state.pendingEventKey = pick.key;
+      pushToast('⚠️ ' + pick.hazardName.toUpperCase() + ' SURGE INCOMING — press ' + pick.slot + ' (' + pick.term + ')!');
+      return;
+    }
+
+    if(state.eventWarned && now >= state.nextEventAt){
+      state.activeEvent = { key: state.pendingEventKey, endsAt: now + EVENT_DURATION_MS };
+      var h = HAZARDS.filter(function(hz){ return hz.key === state.activeEvent.key; })[0];
+      pushToast(h.icon + ' ' + h.hazardName.toUpperCase() + ' HITS THE WHOLE WORLD!');
+    }
+  }
+
+  function checkZones(dt){
+    var p = state.player;
+    state.zones.forEach(function(z){
+      var el = document.getElementById('zone-' + z.key);
+      var inside = dist(p.x,p.y,z.x,z.y) < z.r + PLAYER_R * 0.5;
+      var a = state.abilities[z.key];
+      var protectedNow = inside && a.active;
+      if(el) el.classList.toggle('shielded', protectedNow);
+      if(inside && !protectedNow){
+        state.hp -= ZONE_DPS * dt;
+      }
+      if(protectedNow){
+        state.countered[z.key] = true;
+      }
+    });
+  }
+
+  function checkEnemyContacts(){
+    var now = performance.now();
+    var p = state.player;
+    state.enemies.forEach(function(e){
+      var touching = dist(p.x,p.y,e.x,e.y) < PLAYER_R + e.r;
+      var a = state.abilities[e.key];
+      var safe = a.active;
+      var el = document.getElementById(e.id);
+      if(el) el.classList.toggle('safe', touching && safe);
+      if(!touching || safe) return;
+      if(now < e.hitCooldownUntil) return;
+      state.hp -= e.damage;
+      e.hitCooldownUntil = now + e.hitCooldownMs;
+      var pel = document.getElementById('player');
+      pel.classList.remove('hurt'); void pel.offsetWidth; pel.classList.add('hurt');
+      // throttle the toast so getting bitten repeatedly doesn't spam the feed —
+      // the shake + HP bar drop is already enough feedback per-hit
+      if(!e.lastToastAt || now - e.lastToastAt > 4000){
+        e.lastToastAt = now;
+        var h = HAZARDS.filter(function(hz){ return hz.key === e.key; })[0];
+        pushToast('The ' + h.enemy.label + ' got you! Try ' + h.slot + ' (' + h.term + ') next time.');
+      }
+    });
+  }
+
+  function render(){
+    positionSprite('player', state.player.x, state.player.y, PLAYER_R);
+    state.enemies.forEach(function(e){ positionSprite(e.id, e.x, e.y, e.r); });
+    state.zones.forEach(function(z){ positionSprite('zone-' + z.key, z.x, z.y, z.r); });
+
+    var playerPower = getPlayerPower();
+    state.rivals.forEach(function(r){
+      positionSprite(r.id, r.x, r.y, r.r);
+      var el = document.getElementById(r.id);
+      var badge = document.getElementById(r.id + '-badge');
+      var stronger = r.power > playerPower;
+      if(el){ el.classList.toggle('stronger', stronger); el.classList.toggle('weaker', !stronger); }
+      if(badge){ badge.classList.toggle('stronger', stronger); badge.classList.toggle('weaker', !stronger); }
+    });
+
+    var powerPill = document.getElementById('power-pill');
+    var boosted = playerPower > PLAYER_BASE_POWER;
+    powerPill.textContent = '💪 Power: ' + playerPower + (boosted ? ' (boosted!)' : '');
+    powerPill.classList.toggle('boosted', boosted);
+
+    renderWorldEvent();
+
+    var hpPct = Math.max(0, state.hp);
+    var hpFill = document.getElementById('hp-fill');
+    hpFill.style.width = hpPct + '%';
+    hpFill.style.background = hpPct < 30 ? 'var(--coral)' : (hpPct < 60 ? '#f0b429' : 'var(--green)');
+
+    var hungerPct = Math.max(0, state.hunger);
+    var hungerFill = document.getElementById('hunger-fill');
+    hungerFill.style.width = hungerPct + '%';
+    hungerFill.style.background = hungerPct < 25 ? 'var(--coral)' : '#ffb454';
+
+    var mw = document.getElementById('minimap').clientWidth || 110, mh = document.getElementById('minimap').clientHeight || 86;
+    var sx = mw / WORLD_W, sy = mh / WORLD_H;
+    var pdot = document.getElementById('minimap-player');
+    if(pdot){ pdot.style.left = (state.player.x*sx - 3) + 'px'; pdot.style.top = (state.player.y*sy - 3) + 'px'; }
+
+    var playerEl = document.getElementById('player');
+    var activeShield = null;
+    HAZARDS.forEach(function(h){
+      var a = state.abilities[h.key];
+      var slot = document.getElementById('slot-' + h.key);
+      slot.classList.toggle('active', a.active);
+      if(a.active) activeShield = h.shieldClass;
+    });
+    ['shield-cold','shield-heat','shield-dry','shield-rad','shield-vac'].forEach(function(c){ playerEl.classList.remove(c); });
+    if(activeShield) playerEl.classList.add(activeShield);
+  }
+
+  function renderWorldEvent(){
+    var overlay = document.getElementById('event-overlay');
+    var pill = document.getElementById('event-pill');
+    var now = performance.now();
+
+    document.querySelectorAll('.ability-slot').forEach(function(s){ s.classList.remove('event-target'); });
+    overlay.className = 'event-overlay';
+
+    if(state.activeEvent){
+      var h = HAZARDS.filter(function(hz){ return hz.key === state.activeEvent.key; })[0];
+      overlay.classList.add('live', h.zoneClass);
+      pill.className = 'event-pill show';
+      pill.textContent = h.icon + ' ' + h.term.toUpperCase() + ' SURGE — press ' + h.slot;
+      var slot = document.getElementById('slot-' + h.key);
+      if(slot) slot.classList.add('event-target');
+    } else if(state.eventWarned && state.pendingEventKey){
+      var h2 = HAZARDS.filter(function(hz){ return hz.key === state.pendingEventKey; })[0];
+      overlay.classList.add('warn');
+      pill.className = 'event-pill show';
+      var secs = Math.max(0, Math.ceil((state.nextEventAt - now) / 1000));
+      pill.textContent = '⚠️ ' + h2.term.toUpperCase() + ' in ' + secs + 's';
+      var slot2 = document.getElementById('slot-' + h2.key);
+      if(slot2) slot2.classList.add('event-target');
+    } else {
+      pill.className = 'event-pill';
+      pill.textContent = '';
+    }
+  }
+
+  function endGame(won){
+    state.running = false;
+    cancelAnimationFrame(rafId);
+    document.getElementById('game-play').classList.add('hidden');
+
+    if(won){
+      document.getElementById('game-win').classList.remove('hidden');
+      document.getElementById('win-score').textContent = state.score;
+      document.getElementById('win-food').textContent = state.foodEaten;
+      document.getElementById('win-rivals').textContent = state.rivalsEaten;
+      document.getElementById('win-powers').textContent = Object.keys(state.learned).length + '/5';
+      document.getElementById('win-countered').textContent = Object.keys(state.countered).length + '/5';
+      buildGlossary(document.getElementById('glossary-win'));
+    } else {
+      document.getElementById('game-lose').classList.remove('hidden');
+      document.getElementById('lose-time').textContent = Math.floor(GAME_TIME - state.timeLeft) + 's';
+      document.getElementById('lose-score').textContent = state.score;
+      document.getElementById('lose-food').textContent = state.foodEaten;
+      document.getElementById('lose-rivals').textContent = state.rivalsEaten;
+      buildGlossary(document.getElementById('glossary-lose'));
+    }
+  }
+
+  function buildGlossary(container){
+    container.innerHTML = '';
+    HAZARDS.forEach(function(h){
+      var gotIt = state.learned[h.key];
+      var card = document.createElement('div');
+      card.className = 'card' + (gotIt ? ' got-it' : '');
+      card.innerHTML =
+        '<h3>' + h.term + (gotIt ? '<span class="mark">✅</span>' : '') + '</h3>' +
+        '<p><strong>What it means:</strong> ' + h.def + '</p>' +
+        '<p style="margin-top:8px;"><strong>Why it saves you:</strong> ' + h.why + ' (Countered: ' + h.hazardName + ' and the ' + h.enemy.label + ')</p>';
+      container.appendChild(card);
+    });
+  }
+</script>
+
+</body>
+</html>
