@@ -235,11 +235,12 @@
   @keyframes food-pulse{ 0%,100%{ transform:scale(1); opacity:.9; } 50%{ transform:scale(1.2); opacity:1; } }
 
   .enemy{
-    position:absolute; border-radius:18%; z-index:4; will-change:transform;
+    position:absolute; z-index:4; will-change:transform;
     background-size:contain; background-repeat:no-repeat; background-position:center;
-    box-shadow:0 4px 10px rgba(0,0,0,0.4); transition:box-shadow .2s ease;
+    filter:drop-shadow(0 3px 4px rgba(0,0,0,0.45));
+    transition:filter .2s ease;
   }
-  .enemy.safe{ box-shadow:0 4px 10px rgba(0,0,0,0.4), 0 0 0 3px rgba(62,207,142,0.9); }
+  .enemy.safe{ filter:drop-shadow(0 3px 4px rgba(0,0,0,0.45)) drop-shadow(0 0 4px rgba(62,207,142,0.95)) drop-shadow(0 0 8px rgba(62,207,142,0.65)); }
   .enemy.frostmite{ background-image:url('sprites/frostmite.png'); }
   .enemy.embernematode{ background-image:url('sprites/embernematode.png'); }
   .enemy.dustrotifer{ background-image:url('sprites/dustrotifer.png'); }
@@ -247,13 +248,13 @@
   .enemy.voidwisp{ background-image:url('sprites/voidwisp.png'); }
 
   .rival{
-    position:absolute; border-radius:18%; z-index:4; will-change:transform;
+    position:absolute; z-index:4; will-change:transform;
     background-image:url('sprites/rival.png'); background-size:contain; background-repeat:no-repeat; background-position:center;
-    box-shadow:0 4px 10px rgba(0,0,0,0.4);
-    transition:box-shadow .25s ease, filter .25s ease;
+    filter:drop-shadow(0 3px 4px rgba(0,0,0,0.45));
+    transition:filter .25s ease;
   }
-  .rival.stronger{ box-shadow:0 4px 10px rgba(0,0,0,0.4), 0 0 0 4px rgba(249,97,103,0.95), 0 0 16px rgba(249,97,103,0.7); }
-  .rival.weaker{ box-shadow:0 4px 10px rgba(0,0,0,0.4), 0 0 0 4px rgba(62,207,142,0.95), 0 0 14px rgba(62,207,142,0.7); }
+  .rival.stronger{ filter:drop-shadow(0 3px 4px rgba(0,0,0,0.45)) drop-shadow(0 0 4px rgba(249,97,103,0.95)) drop-shadow(0 0 9px rgba(249,97,103,0.7)); }
+  .rival.weaker{ filter:drop-shadow(0 3px 4px rgba(0,0,0,0.45)) drop-shadow(0 0 4px rgba(62,207,142,0.95)) drop-shadow(0 0 8px rgba(62,207,142,0.7)); }
   .rival-badge{
     position:absolute; top:-8px; right:-8px; z-index:5; min-width:18px; height:18px; padding:0 3px;
     border-radius:9px; background:#fff; color:var(--navy); font-size:.62rem; font-weight:700;
@@ -264,16 +265,16 @@
   .rival-badge.weaker{ background:var(--green); color:#020a07; }
 
   .player{
-    position:absolute; width:36px; height:36px; border-radius:18%; z-index:5; will-change:transform;
+    position:absolute; width:36px; height:36px; z-index:5; will-change:transform;
     background-image:url('sprites/player.png'); background-size:contain; background-repeat:no-repeat; background-position:center;
-    box-shadow:0 4px 10px rgba(0,0,0,0.3), 0 0 0 3px rgba(255,255,255,0.5);
-    transition:box-shadow .2s ease;
+    filter:drop-shadow(0 3px 4px rgba(0,0,0,0.35));
+    transition:filter .2s ease;
   }
-  .player.shield-cold{ box-shadow:0 4px 10px rgba(0,0,0,0.3), 0 0 0 4px rgba(120,180,255,0.95), 0 0 14px rgba(120,180,255,0.9); }
-  .player.shield-heat{ box-shadow:0 4px 10px rgba(0,0,0,0.3), 0 0 0 4px rgba(255,120,90,0.95), 0 0 14px rgba(255,120,90,0.9); }
-  .player.shield-dry{ box-shadow:0 4px 10px rgba(0,0,0,0.3), 0 0 0 4px rgba(210,180,110,0.95), 0 0 14px rgba(210,180,110,0.9); }
-  .player.shield-rad{ box-shadow:0 4px 10px rgba(0,0,0,0.3), 0 0 0 4px rgba(140,220,110,0.95), 0 0 14px rgba(140,220,110,0.9); }
-  .player.shield-vac{ box-shadow:0 4px 10px rgba(0,0,0,0.3), 0 0 0 4px rgba(150,140,230,0.95), 0 0 14px rgba(150,140,230,0.9); }
+  .player.shield-cold{ filter:drop-shadow(0 3px 4px rgba(0,0,0,0.35)) drop-shadow(0 0 4px rgba(120,180,255,0.95)) drop-shadow(0 0 8px rgba(120,180,255,0.8)); }
+  .player.shield-heat{ filter:drop-shadow(0 3px 4px rgba(0,0,0,0.35)) drop-shadow(0 0 4px rgba(255,120,90,0.95)) drop-shadow(0 0 8px rgba(255,120,90,0.8)); }
+  .player.shield-dry{ filter:drop-shadow(0 3px 4px rgba(0,0,0,0.35)) drop-shadow(0 0 4px rgba(210,180,110,0.95)) drop-shadow(0 0 8px rgba(210,180,110,0.8)); }
+  .player.shield-rad{ filter:drop-shadow(0 3px 4px rgba(0,0,0,0.35)) drop-shadow(0 0 4px rgba(140,220,110,0.95)) drop-shadow(0 0 8px rgba(140,220,110,0.8)); }
+  .player.shield-vac{ filter:drop-shadow(0 3px 4px rgba(0,0,0,0.35)) drop-shadow(0 0 4px rgba(150,140,230,0.95)) drop-shadow(0 0 8px rgba(150,140,230,0.8)); }
   .player.hurt{ animation:hurt-shake .3s ease; }
   @keyframes hurt-shake{ 0%,100%{ transform:translateX(0); } 25%{ transform:translateX(-4px); } 75%{ transform:translateX(4px); } }
 
